@@ -3,7 +3,7 @@ import {useNavigate} from 'react-router-dom';
 
 import axios from 'axios';
 
-import {Container,Navbar,Nav,Button,Form,Row,Col,Card,NavDropdown,Table,Modal} from 'react-bootstrap';
+import {Container,Navbar,Nav,Button,Form,Row,Col,Card,NavDropdown,Table,Modal,Spinner} from 'react-bootstrap';
 import {jwtDecode} from 'jwt-decode';
 import {API_ENDPOINT} from './Api';
 import Cookies from 'js-cookie';
@@ -36,15 +36,19 @@ function Dashboard () {
         setShowEditTask(true);
     }
 
+    const [pageLoading, setPageLoading] = useState(false);
+    
     const navigate = useNavigate();
 
     useEffect(() => {
         const decodeUserId = async() => {
+            setPageLoading(true)
             try {
             const response = await axios.get(`${API_ENDPOINT}/token`,{
                     withCredentials:true})
             // console.log(response.data);
             setUser(response.data)
+            setPageLoading(false)
             } catch(error) {
                 navigate('/login');
             }
@@ -118,7 +122,18 @@ function Dashboard () {
     }
     return (
         <>
-            <Navbar bg='primary'data-bs-theme="dark">
+            {
+                pageLoading ? 
+                <>
+                    <div className="d-flex justify-content-center align-items-center" style={{ height: '100vh' }}>
+                        <Spinner animation="grow" size="sm" variant="danger" />
+                        <Spinner animation="grow"variant="warning" />
+                        <Spinner animation="grow"variant="success" />
+                    </div>
+                    
+                </>
+                : <> 
+                <Navbar bg='primary'data-bs-theme="dark">
                 <Navbar.Brand>To Do List App</Navbar.Brand>
                     <Nav className='me-auto'>
                         <Nav.Link>Users</Nav.Link>
@@ -133,26 +148,26 @@ function Dashboard () {
                             </NavDropdown>
                         </Nav>
                     </Navbar.Collapse>
-            </Navbar>
-        <br />
-        <Container>
-            <Row>
-            <span>
-                Dashboard
-            </span>
-            <br />
-            <div>
-                <Button variant="warning" onClick={handleOpenAddTask}>Add Task</Button>
-            </div>           
-            <Table striped="columns">
-                <thead>
-                    <tr>
-                        <th>#</th>
-                        <th>Task</th>
-                        <th>Action</th>
-                    </tr>
-                </thead>
-                <tbody>
+                </Navbar>
+                <br />
+                <Container>
+                    <Row>
+                        <span>
+                        Dashboard
+                        </span>
+                <br />
+                <div>
+                    <Button variant="warning" onClick={handleOpenAddTask}>Add Task</Button>
+                </div>           
+                <Table striped="columns">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Task</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
                     {
                         tasks.length > 0 && (
                             tasks.map((taskData,key)=>(
@@ -161,98 +176,99 @@ function Dashboard () {
                                     <td>{taskData.task_name}</td>
                                     <td>
                                     <Button variant="success"onClick={()=>handleOpenTask(taskData)}>View</Button> 
-                                    <Button variant="primary" onClick={()=>handleOpenEditTask(taskData)}>Edit</Button> 
+                                    <Button variant="primary" onClick={()=>handleOpenEditTask(taskData)}className='mx-2'>Edit</Button> 
                                     <Button variant="danger" onClick={()=>deleteTask(taskData.task_id)}>Delete</Button></td>
                                 </tr>
                             ))
                         )
                     }
-    
-                </tbody>
-            </Table>
+                    </tbody>
+                </Table>
 
-            <Modal 
-            show={showAddtask}
-            onHide={handleCloseAddTask}
-            backdrop='static'
-            keyboard={false}>
-            <Modal.Header closeButton>
-                <Modal.Title>Add Task</Modal.Title>
-            </Modal.Header>
-            <Modal.Body>
-                <span className='mb-2'>Enter your task</span>
-                <br />
-                <Form onSubmit={addTask} id='addTaskForm'>
-                    <Form.Group>
-                        <Form.Control type='text' 
-                        onChange={(e)=>setValues({...values,task_name: e.target.value})}></Form.Control>
-                    </Form.Group>
-                </Form>
-            </Modal.Body>
-            <Modal.Footer>
-                <Button type='submit' form='addTaskForm'>Submit</Button>
-                <Button variant='secondary'onClick={handleCloseAddTask}>Close</Button>
-            </Modal.Footer>
-                </Modal>
-
-            <Modal 
-            show={showTask}
-            onHide={handleCloseTask}
-            backdrop='static'
-            keyboard={false}>
-            <Modal.Header closeButton>
-                <Modal.Title>Viewing Task</Modal.Title>
-            </Modal.Header>
-            <Modal.Body>
-               {specificTask ? (
-                    <Form>
+                <Modal 
+                show={showAddtask}
+                onHide={handleCloseAddTask}
+                backdrop='static'
+                keyboard={false}>
+                <Modal.Header closeButton>
+                    <Modal.Title>Add Task</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <span className='mb-2'>Enter your task</span>
+                    <br />
+                    <Form onSubmit={addTask} id='addTaskForm'>
                         <Form.Group>
-                            <Form.Control value={specificTask.task_name} readOnly>
-                            </Form.Control>
-                        </Form.Group>
-                        <Form.Group>
-                            <Form.Control value={specificTask.created_at} readOnly></Form.Control>
+                            <Form.Control type='text' 
+                            onChange={(e)=>setValues({...values,task_name: e.target.value})}></Form.Control>
                         </Form.Group>
                     </Form>
-               ) : (
-                <p>No data available</p>
-               )}
-            </Modal.Body>
-            <Modal.Footer>
-                <Button variant='secondary'onClick={handleCloseTask}>Close</Button>
-            </Modal.Footer>
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button type='submit' form='addTaskForm'>Submit</Button>
+                    <Button variant='secondary'onClick={handleCloseAddTask}>Close</Button>
+                </Modal.Footer>
                 </Modal>
 
-            <Modal 
-            show={showEdittask}
-            onHide={handleCloseEditTask}
-            backdrop='static'
-            keyboard={false}>
-            <Modal.Header closeButton>
-                <Modal.Title>Edit Task</Modal.Title>
-            </Modal.Header>
-            <Modal.Body>
-                {editValue ? (
-                        <Form onSubmit={editTask} id='editForm'>
+                <Modal 
+                show={showTask}
+                onHide={handleCloseTask}
+                backdrop='static'
+                keyboard={false}>
+                <Modal.Header closeButton>
+                    <Modal.Title>Viewing Task</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                {specificTask ? (
+                        <Form>
                             <Form.Group>
-                                <Form.Control value={editValue.task_name} 
-                                type='text' 
-                                onChange={(e)=>setEditValue({...editValue,task_name: e.target.value})}>
+                                <Form.Control value={specificTask.task_name} readOnly>
                                 </Form.Control>
+                            </Form.Group>
+                            <Form.Group>
+                                <Form.Control value={specificTask.created_at} readOnly></Form.Control>
                             </Form.Group>
                         </Form>
                 ) : (
                     <p>No data available</p>
                 )}
                 </Modal.Body>
-            <Modal.Footer>
-                <Button type='submit' form='editForm'>Submit</Button>
-                <Button variant='secondary'onClick={handleCloseEditTask}>Close</Button>
-            </Modal.Footer>
+                <Modal.Footer>
+                    <Button variant='secondary'onClick={handleCloseTask}>Close</Button>
+                </Modal.Footer>
                 </Modal>
-            </Row>
-        </Container>
-            </>
+
+                <Modal 
+                show={showEdittask}
+                onHide={handleCloseEditTask}
+                backdrop='static'
+                keyboard={false}>
+                <Modal.Header closeButton>
+                    <Modal.Title>Edit Task</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    {editValue ? (
+                            <Form onSubmit={editTask} id='editForm'>
+                                <Form.Group>
+                                    <Form.Control value={editValue.task_name} 
+                                    type='text' 
+                                    onChange={(e)=>setEditValue({...editValue,task_name: e.target.value})}>
+                                    </Form.Control>
+                                </Form.Group>
+                            </Form>
+                    ) : (
+                        <p>No data available</p>
+                    )}
+                    </Modal.Body>
+                <Modal.Footer>
+                    <Button type='submit' form='editForm'>Submit</Button>
+                    <Button variant='secondary'onClick={handleCloseEditTask}>Close</Button>
+                </Modal.Footer>
+                    </Modal>
+                    </Row>
+            </Container>
+                </>
+            }    
+        </>
     )
 }
 
