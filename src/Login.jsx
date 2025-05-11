@@ -5,7 +5,7 @@ import Cookies from 'js-cookie';
 
 import 'bootstrap/dist/css/bootstrap.css';
 
-import {Container,Navbar,Nav,Button,Form,Row,Col,Card} from 'react-bootstrap';
+import {Container,Navbar,Nav,Button,Form,Row,Col,Card,Spinner} from 'react-bootstrap';
 
 import {jwtDecode} from 'jwt-decode';
 
@@ -13,44 +13,25 @@ import {API_ENDPOINT} from './Api';
 
 function Login() {
     const navigate = useNavigate();
-    const [user, setUser] = useState(null);
     const [error, setError] = useState('');
     const [username, setUsername] = useState('');
-    const[password, setPassword] = useState('');
+    const [password, setPassword] = useState('');
+    const [buttonLoading, setButtonLoading] = useState(false);
 
-    // useEffect(() => {
-    //     const checkUserSession = async () => {
-    //         try{
-    //             const checkUserToken = JSON.parse(localStorage.getItem('token'));
-    //             setUser(checkUserToken.data);
-
-    //             navigate('/');
-    //         } catch(error){
-    //             navigate('/login');
-    //         }
-    //     }
-    //     checkUserSession();
-    // }, []);
     const handleSubmit = async (e) => {
         e.preventDefault();
+        setButtonLoading(true)
         try{
-            // const response = await axios.post(`${API_ENDPOINT}/auth/login`,{
-            //     username,
-            //     password
-            // },{
-            //     withCredentials: true
-            // });
-            // console.log(response)
-            const login = await axios.post(`${API_ENDPOINT}/auth/login`,{
+            await axios.post(`${API_ENDPOINT}/auth/login`,{
                 username,
                 password
             });
-            const token = login.data.token;
-            localStorage.setItem('token',JSON.stringify(token));
+            setButtonLoading(false)
             setError('');
             navigate('/');
         } catch(error) {
-           setError(error);
+            setButtonLoading(false)
+            setError(error);
         }
     }
     return (
@@ -89,7 +70,19 @@ function Login() {
                                 </Form.Group>
                                 <br />
                                 <Form.Group>
-                                    <Button type='submit'>Login</Button>
+                                    <Button type='submit' disabled={buttonLoading}>
+                                        {buttonLoading ? 
+                                        <>
+                                            <Spinner
+                                            as="span"
+                                            animation="border"
+                                            size="sm"
+                                            role="status"
+                                            aria-hidden="true"
+                                            /> Please Wait
+                                        </>
+                                        : 'Login'}
+                                        </Button>
                                 </Form.Group>
                             </Form>
                             </Card.Body>
