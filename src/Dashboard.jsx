@@ -13,11 +13,29 @@ axios.defaults.withCredentials = true;
 function Dashboard () {
     const [user, setUser] = useState(null);
     const [tasks, setTasks] = useState([]);
+    const [specificTask, setSpecificTask] = useState(null)
     const [showAddtask, setShowAddTask] = useState(false);
 
     const handleCloseAddTask = () => setShowAddTask(false);
     const handleOpenAddTask = () => setShowAddTask(true);
-    
+
+    const [showTask, setShowTask] = useState(false);
+
+    const handleCloseTask = () => setShowTask(false);
+    const handleOpenTask = (taskData) => {
+        setSpecificTask(taskData)
+        setShowTask(true);
+    }
+
+    const [editValue, setEditValue] = useState(null);
+    const [showEdittask, setShowEditTask] = useState(false);
+
+    const handleCloseEditTask = () => setShowEditTask(false);
+    const handleOpenEditTask = (taskData) => {
+        setEditValue(taskData)
+        setShowEditTask(true);
+    }
+
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -82,6 +100,18 @@ function Dashboard () {
         }).catch((err)=>console.log(err))
         handleCloseAddTask();
     }
+     // Edit task
+    const editTask = async (e) =>{
+        e.preventDefault();
+        const id = editValue.task_id
+       
+        axios.put(`${API_ENDPOINT}/task/${id}`,editValue,{headers:headers}).then((res)=>{
+            console.log(res)
+            fetchTasks();
+        }).catch((err)=>console.log(err))
+        handleCloseEditTask();
+    }
+    
     // Read All tasks by user
     const fetchTasks = async () => {
         if(user && user.user_id) {
@@ -91,7 +121,13 @@ function Dashboard () {
                 setTasks(data.message);
             });
         }
-    }   
+    }
+    // Delete task
+    const deleteTask = async (id) => {
+        await axios.delete(`${API_ENDPOINT}/task/${id}`,{headers:headers}).then(({data})=>{
+            fetchTasks()
+        }).catch((err)=>console.log(err))
+    }
     return (
         <>
             <Navbar bg='primary'data-bs-theme="dark">
@@ -139,7 +175,10 @@ function Dashboard () {
                                 <tr key={taskData.task_id}>
                                     <td>{key + 1}</td>
                                     <td>{taskData.task_name}</td>
-                                    <td><Button>Edit</Button> <Button variant="danger">Delete</Button></td>
+                                    <td>
+                                    <Button variant="success"onClick={()=>handleOpenTask(taskData)}>View</Button> 
+                                    <Button variant="primary" onClick={()=>handleOpenEditTask(taskData)}>Edit</Button> 
+                                    <Button variant="danger" onClick={()=>deleteTask(taskData.task_id)}>Delete</Button></td>
                                 </tr>
                             ))
                         )
@@ -169,6 +208,62 @@ function Dashboard () {
             <Modal.Footer>
                 <Button type='submit'>Submit</Button>
                 <Button variant='secondary'onClick={handleCloseAddTask}>Close</Button>
+            </Modal.Footer>
+                </Modal>
+
+            <Modal 
+            show={showTask}
+            onHide={handleCloseTask}
+            backdrop='static'
+            keyboard={false}>
+            <Modal.Header closeButton>
+                <Modal.Title>Viewing Task</Modal.Title>
+            </Modal.Header>
+            <Modal.Body>
+               {specificTask ? (
+                    <Form>
+                        <Form.Group>
+                            <Form.Control value={specificTask.task_name} readOnly>
+                            </Form.Control>
+                        </Form.Group>
+                        <Form.Group>
+                            <Form.Control value={specificTask.created_at} readOnly></Form.Control>
+                        </Form.Group>
+                    </Form>
+               ) : (
+                <p>No data available</p>
+               )}
+            </Modal.Body>
+            <Modal.Footer>
+                <Button variant='secondary'onClick={handleCloseAddTask}>Close</Button>
+            </Modal.Footer>
+                </Modal>
+
+            <Modal 
+            show={showEdittask}
+            onHide={handleCloseEditTask}
+            backdrop='static'
+            keyboard={false}>
+            <Modal.Header closeButton>
+                <Modal.Title>Edit Task</Modal.Title>
+            </Modal.Header>
+            <Modal.Body>
+                {editValue ? (
+                        <Form onSubmit={editTask}>
+                            <Form.Group>
+                                <Form.Control value={editValue.task_name} 
+                                type='text' 
+                                onChange={(e)=>setEditValue({...editValue,task_name: e.target.value})}>
+                                </Form.Control>
+                            </Form.Group>
+                        </Form>
+                ) : (
+                    <p>No data available</p>
+                )}
+                </Modal.Body>
+            <Modal.Footer>
+                <Button type='submit'>Submit</Button>
+                <Button variant='secondary'onClick={handleCloseEditTask}>Close</Button>
             </Modal.Footer>
                 </Modal>
             </Row>
