@@ -181,7 +181,11 @@ function Dashboard () {
                                     <Button variant="danger" onClick={()=>deleteTask(taskData.task_id)}>Delete</Button></td>
                                 </tr>
                             ))
-                        ) : (<span><strong>No Task Available</strong></span>)
+                        ) : (<tr colSpan='3'>
+                                <td>
+                                    <span><strong>No Task Available</strong></span>
+                                </td>
+                            </tr>)
                         
                     }
                     </tbody>
