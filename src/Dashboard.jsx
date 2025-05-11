@@ -56,7 +56,8 @@ function Dashboard () {
     },[user])
     const handleLogout = async () => {
         try {
-            localStorage.removeItem('token');
+            await axios.post(`${API_ENDPOINT}/token/logout`,{
+                    withCredentials:true})
             navigate('/login');
         } catch(error) {
             console.error('Logout failed',error)
