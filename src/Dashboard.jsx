@@ -198,7 +198,7 @@ function Dashboard () {
             <Modal.Body>
                 <span className='mb-2'>Enter your task</span>
                 <br />
-                <Form onSubmit={addTask}>
+                <Form onSubmit={addTask} id='addTaskForm'>
                     <Form.Group>
                         <Form.Control type='text' 
                         onChange={(e)=>setValues({...values,task_name: e.target.value})}></Form.Control>
@@ -206,7 +206,7 @@ function Dashboard () {
                 </Form>
             </Modal.Body>
             <Modal.Footer>
-                <Button type='submit'>Submit</Button>
+                <Button type='submit' form='addTaskForm'>Submit</Button>
                 <Button variant='secondary'onClick={handleCloseAddTask}>Close</Button>
             </Modal.Footer>
                 </Modal>
@@ -235,7 +235,7 @@ function Dashboard () {
                )}
             </Modal.Body>
             <Modal.Footer>
-                <Button variant='secondary'onClick={handleCloseAddTask}>Close</Button>
+                <Button variant='secondary'onClick={handleCloseTask}>Close</Button>
             </Modal.Footer>
                 </Modal>
 
@@ -249,7 +249,7 @@ function Dashboard () {
             </Modal.Header>
             <Modal.Body>
                 {editValue ? (
-                        <Form onSubmit={editTask}>
+                        <Form onSubmit={editTask} id='editForm'>
                             <Form.Group>
                                 <Form.Control value={editValue.task_name} 
                                 type='text' 
@@ -262,7 +262,7 @@ function Dashboard () {
                 )}
                 </Modal.Body>
             <Modal.Footer>
-                <Button type='submit'>Submit</Button>
+                <Button type='submit' form='editForm'>Submit</Button>
                 <Button variant='secondary'onClick={handleCloseEditTask}>Close</Button>
             </Modal.Footer>
                 </Modal>
