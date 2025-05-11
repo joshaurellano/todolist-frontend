@@ -169,7 +169,8 @@ function Dashboard () {
                     </thead>
                     <tbody>
                     {
-                        tasks.length > 0 && (
+                        tasks && tasks.length > 0 ? 
+                        (
                             tasks.map((taskData,key)=>(
                                 <tr key={taskData.task_id}>
                                     <td>{key + 1}</td>
@@ -180,7 +181,8 @@ function Dashboard () {
                                     <Button variant="danger" onClick={()=>deleteTask(taskData.task_id)}>Delete</Button></td>
                                 </tr>
                             ))
-                        )
+                        ) : (<span><strong>No Task Available</strong></span>)
+                        
                     }
                     </tbody>
                 </Table>
