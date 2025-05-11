@@ -40,39 +40,20 @@ function Dashboard () {
 
     useEffect(() => {
         const decodeUserId = async() => {
-            // try {
-            //     const response = await axios.get(`${API_ENDPOINT}/token`,{
-            //         withCredentials:true})
-            // console.log(response);
-            // const user = response.data
-            // setUser(response.data)
-            // console.log(user)
-            // } catch(error) {
-            //     navigate('/login');
-            // }
             try {
-                const response = JSON.parse(localStorage.getItem('token'))
-                const decoded_token = jwtDecode(response);
-                setUser(decoded_token);
-            }  catch(error) {
+            const response = await axios.get(`${API_ENDPOINT}/token`,{
+                    withCredentials:true})
+            // console.log(response.data);
+            setUser(response.data)
+            } catch(error) {
                 navigate('/login');
             }
         }
-        decodeUserId();
-        
+        decodeUserId();       
     },[]);
     useEffect(() =>{
         fetchTasks();
     },[user])
-
-    const response = JSON.parse(localStorage.getItem('token'));
-    // console.log(response);
-    const token = response;
-
-    const headers = {
-        accept:'application/json',
-        Authorization: token
-    }
     const handleLogout = async () => {
         try {
             localStorage.removeItem('token');
@@ -91,10 +72,12 @@ function Dashboard () {
     })
     const addTask = async (e) =>{
         e.preventDefault();
+        // console.log(user.userID)
         const payload = {
-            ...values,user_id:user?.user_id
+            ...values,user_id:user.user_id
         }
-        axios.post(`${API_ENDPOINT}/task/`,payload,{headers:headers}).then((res)=>{
+        axios.post(`${API_ENDPOINT}/task/`,payload,{
+                    withCredentials:true}).then((res)=>{
             console.log(res)
             fetchTasks();
         }).catch((err)=>console.log(err))
@@ -105,7 +88,8 @@ function Dashboard () {
         e.preventDefault();
         const id = editValue.task_id
        
-        axios.put(`${API_ENDPOINT}/task/${id}`,editValue,{headers:headers}).then((res)=>{
+        axios.put(`${API_ENDPOINT}/task/${id}`,editValue,{
+                    withCredentials:true}).then((res)=>{
             console.log(res)
             fetchTasks();
         }).catch((err)=>console.log(err))
@@ -113,18 +97,21 @@ function Dashboard () {
     }
     
     // Read All tasks by user
-    const fetchTasks = async () => {
-        if(user && user.user_id) {
-            const id=user?.user_id;
-            console.log(id);
-            await axios.get(`${API_ENDPOINT}/task/user/${id}`,{headers:headers}).then(({data})=>{
+    const fetchTasks = async (id) => {
+        if(user&&user.user_id) {
+            const id = user?.user_id
+            // console.log(id);
+            await axios.get(`${API_ENDPOINT}/task/user/${id}`,{
+                    withCredentials:true}).then(({data})=>{
                 setTasks(data.message);
             });
         }
     }
+
     // Delete task
     const deleteTask = async (id) => {
-        await axios.delete(`${API_ENDPOINT}/task/${id}`,{headers:headers}).then(({data})=>{
+        await axios.delete(`${API_ENDPOINT}/task/${id}`,{
+                    withCredentials:true}).then(({data})=>{
             fetchTasks()
         }).catch((err)=>console.log(err))
     }
@@ -146,20 +133,16 @@ function Dashboard () {
                         </Nav>
                     </Navbar.Collapse>
             </Navbar>
-
         <br />
-
         <Container>
             <Row>
             <span>
                 Dashboard
             </span>
             <br />
-
             <div>
                 <Button variant="warning" onClick={handleOpenAddTask}>Add Task</Button>
-            </div>
-            
+            </div>           
             <Table striped="columns">
                 <thead>
                     <tr>

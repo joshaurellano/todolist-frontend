@@ -18,19 +18,19 @@ function Login() {
     const [username, setUsername] = useState('');
     const[password, setPassword] = useState('');
 
-    useEffect(() => {
-        const checkUserSession = async () => {
-            try{
-                const checkUserToken = JSON.parse(localStorage.getItem('token'));
-                setUser(checkUserToken.data);
+    // useEffect(() => {
+    //     const checkUserSession = async () => {
+    //         try{
+    //             const checkUserToken = JSON.parse(localStorage.getItem('token'));
+    //             setUser(checkUserToken.data);
 
-                navigate('/');
-            } catch(error){
-                navigate('/login');
-            }
-        }
-        checkUserSession();
-    }, []);
+    //             navigate('/');
+    //         } catch(error){
+    //             navigate('/login');
+    //         }
+    //     }
+    //     checkUserSession();
+    // }, []);
     const handleSubmit = async (e) => {
         e.preventDefault();
         try{
