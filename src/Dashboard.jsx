@@ -219,15 +219,11 @@ function Dashboard () {
                 </Modal.Header>
                 <Modal.Body>
                 {specificTask ? (
-                        <Form>
-                            <Form.Group>
-                                <Form.Control value={specificTask.task_name} readOnly>
-                                </Form.Control>
-                            </Form.Group>
-                            <Form.Group>
-                                <Form.Control value={specificTask.created_at} readOnly></Form.Control>
-                            </Form.Group>
-                        </Form>
+                    <>
+                        <span><strong>Task: </strong>{specificTask.task_name}</span><br />
+                        <span><strong>Created at: </strong>{new Date(specificTask.created_at).toLocaleDateString()}</span>
+                    </>
+
                 ) : (
                     <p>No data available</p>
                 )}
