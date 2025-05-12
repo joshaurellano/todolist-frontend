@@ -1,5 +1,5 @@
 import React, {useEffect,useState} from 'react';
-import {useNavigate,Link} from 'react-router-dom';
+import {useNavigate} from 'react-router-dom';
 import axios from 'axios';
 
 import 'bootstrap/dist/css/bootstrap.css';
@@ -8,41 +8,52 @@ import {Container,Navbar,Nav,Button,Form,Row,Col,Card,Spinner} from 'react-boots
 
 import {API_ENDPOINT} from './Api';
 
-function Login() {
+function Register() {
     const navigate = useNavigate();
     const [error, setError] = useState('');
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [buttonLoading, setButtonLoading] = useState(false);
+    const [pageLoading, setPageLoading] = useState(false);
+
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        setPageLoading(true)
         setButtonLoading(true)
+
         try{
-            await axios.post(`${API_ENDPOINT}/auth/login`,{
+            await axios.post(`${API_ENDPOINT}/auth/register`,{
                 username,
                 password
             });
+            
             setButtonLoading(false)
             setError('');
-            navigate('/');
+            navigate('/login');
         } catch(error) {
             setButtonLoading(false)
+            setPageLoading(false)
             setError(error);
         }
     }
     return (
         <>
-        <Navbar bg='success' data-bs-theme='dark'>
+        {pageLoading ? (
+            <>
+                <div className="d-flex justify-content-center align-items-center" style={{ height: '100vh' }}>
+                   
+                    <Spinner animation="border" role="status" />
+                    <span style={{color:'gray' ,fontSize:'40px'}}>
+                    Please wait
+                    </span>
+                </div>
+            </>
+    ):(
+    <>
+    <Navbar bg='success' data-bs-theme='dark'>
             <Container>
                 <Navbar.Brand>To Do List</Navbar.Brand>
-                <Button variant ='warning' style={{color:'white', fontWeight:'bold'}}>
-                    <Nav>
-                        <Nav.Link as={Link} to='/register'>
-                        Register
-                        </Nav.Link>
-                        </Nav>
-                    </Button>
             </Container>
         </Navbar>
         
@@ -52,7 +63,7 @@ function Login() {
                     <div>
                         <Card>
                             <Card.Body>
-                            <span style={{display:'flex',justifyContent:'center',fontSize:'24px'}}>Login to</span>
+                            <span style={{display:'flex',justifyContent:'center',fontSize:'24px'}}>Register</span>
                             <span style={{display:'flex',justifyContent:'center',fontWeight:'bold',fontSize:'30px'}}>To Do List App</span> <br/>
                             <Form onSubmit={handleSubmit}>
                                 <Form.Group>
@@ -85,7 +96,7 @@ function Login() {
                                             aria-hidden="true"
                                             /> Please Wait
                                         </>
-                                        : 'Login'}
+                                        : 'Create Account'}
                                         </Button>
                                 </Form.Group>
                             </Form>
@@ -95,8 +106,10 @@ function Login() {
                 </Col>
             </Row>
         </Container>
-
+        </>
+        )
+}
             </>
     )
 }
-export default Login
+export default Register
